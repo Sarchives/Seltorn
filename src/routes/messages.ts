@@ -246,7 +246,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         const guildId = urlParams[0];
         const channelId = urlParams[1];
         const messageId = urlParams[2];
-        if (guildId && channelId && messageId && req.body.message && req.body.message.length < 4001) {
+        if (guildId && channelId && messageId) {
             database.query(`SELECT * FROM guilds`, async (err, dbRes) => {
                 if (!err) {
                     const guild = dbRes.rows.find(x => x?.id == guildId);
