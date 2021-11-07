@@ -2,20 +2,9 @@ import express from 'express';
 import { Client } from 'pg';
 import FlakeId from 'flake-idgen';
 const intformat = require('biguint-format');
-import { Guild } from '../interfaces';
+import { Guild, Member } from '../interfaces';
 
 export default (websockets: Map<string, WebSocket[]>, app: express.Application, database: Client, flake: FlakeId) => {
-    app.get('/guilds', (req: express.Request, res: express.Response) => {
-            database.query(`SELECT * FROM guilds`, (err, dbRes) => {
-                if (!err) {
-                    const guilds = dbRes.rows.filter(x => x?.members?.includes(res.locals.user));
-                            res.send(guilds.map(guild => Object.keys(guild).reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(guild).map(x => x == 'channels' || x == 'members' || x == 'roles' ? JSON.parse(guild[x]) : guild[x])[index] }), {})));
-                } else {
-                    res.status(500).send({});
-                }
-            });
-    });
-
     app.get('/guilds/*', (req: express.Request, res: express.Response) => {
         const urlParamsValues: string[] = Object.values(req.params);
         const guildId = urlParamsValues
@@ -28,7 +17,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                 if (!err) {
                     const guild = dbRes.rows.find(x => x?.id == guildId);
                     if (guild) {
-                        if (guild.members.includes(res.locals.user)) {
+                        if (JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user)) {
                             res.send(Object.keys(guild).reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(guild).map(x => x == 'channels' || x == 'members' || x == 'roles' ? JSON.parse(guild[x]) : guild[x])[index] }), {}));
                         } else {
                             res.status(401).send({});
@@ -52,8 +41,8 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                 name: req.body.name,
                 description: req.body.description ?? null,
                 public: false,
-                channels: [{ id: intformat(flake.next(), 'dec').toString(), name: 'general', topic: null, creation: Date.now(), roles: [{ id: 0, permissions: 456 }, { id: 1, permissions: 192 }], messages: [], pins: [] }],
-                roles: [{ id: '0', name: 'Owner', permissions: 3647, color: null, hoist: false }, { id: 1, name: 'Members', permissions: 513, color: null, hoist: false }],
+                channels: [{ id: intformat(flake.next(), 'dec').toString(), name: 'general', topic: null, creation: Date.now(), roles: [{ id: '0', permissions: 456 }, { id: '1', permissions: 192 }], messages: [], pins: [] }],
+                roles: [{ id: '0', name: 'Owner', permissions: 3647, color: null, hoist: false }, { id: '1', name: 'Members', permissions: 513, color: null, hoist: false }],
                 members: [{ id: res.locals.user, nickname: null, roles: ['0', '1'] }],
                 creation: Date.now(),
                 bans: []

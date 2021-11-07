@@ -27,6 +27,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
     account(websockets, app, database, flake);
 
     app.use(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        if(!req.url.startsWith('/icons')) {
         const user: User = await checkLogin(req.headers.authorization ?? "");
        if(user.creation != 0) {
                     res.locals.user = user.id;
@@ -34,6 +35,9 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
        } else {
            res.status(401).send({});
        }
+    } else {
+        next();
+    }
     });
     users(websockets, app, database);
 
@@ -50,7 +54,11 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
     friends(websockets, app, database);
 
     app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+        if(req.url.startsWith('/icons/users/')) {
+            res.redirect('/icons/user.png');
+        } else {
         res.status(404).send({});
+        }
     });
 
     app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

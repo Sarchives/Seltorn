@@ -1,5 +1,5 @@
 import express from 'express';
-import { User, ReturnedUser, Info } from '../interfaces';
+import { User, Member, ReturnedUser, Info } from '../interfaces';
 
 import argon2 from 'argon2';
     import { SignJWT } from 'jose/jwt/sign';
@@ -7,6 +7,54 @@ import argon2 from 'argon2';
 import { Client } from 'pg';
 
 export default (websockets: Map<string, WebSocket[]>, app: express.Application, database: Client) => {
+    app.get('/users/@me/guilds', (req: express.Request, res: express.Response) => {
+        database.query(`SELECT * FROM guilds`, (err, dbRes) => {
+            if (!err) {
+                const guilds = dbRes.rows.filter(x => x?.members?.includes(res.locals.user));
+                        res.send(guilds.map(guild => Object.keys(guild).reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(guild).map(x => x == 'channels' || x == 'members' || x == 'roles' ? JSON.parse(guild[x]) : guild[x])[index] }), {})));
+            } else {
+                res.status(500).send({});
+            }
+        });
+});
+
+app.delete('/users/@me/guilds/*', (req: express.Request, res: express.Response) => {
+    const urlParamsValues: string[] = Object.values(req.params);
+        const guildId = urlParamsValues
+            .map((x) => x.replace(/\//g, ''))
+            .filter((x) => {
+                return x != '';
+            })[0];
+        if (guildId) {
+            database.query(`SELECT * FROM guilds`, (err, dbRes) => {
+                if (!err) {
+                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    if (guild) {
+                        const members = JSON.parse(guild.members);
+                        if (members.find((x: Member) => x?.id == res.locals.user) && !members.find((x: Member) => x?.id == res.locals.user)?.roles.includes("0")) {
+                            members.splice(members.indexOf(res.locals.user), 1);
+                            database.query(`UPDATE guilds SET members = $1`, [JSON.stringify(members)], (err, dbRes) => {
+                                if (!err) {
+                                        res.status(200).send(guild);
+                                    } else {
+                                        res.status(500).send({});
+                                    }
+                            });
+                        } else {
+                            res.status(401).send({});
+                        }
+                    } else {
+                        res.status(404).send({});
+                    }
+                } else {
+                    res.status(500).send({});
+                }
+            });
+        } else {
+            res.status(404).send({});
+        }
+});
+
     app.get('/users/@me', async (req: express.Request, res: express.Response) => {
             database.query(`SELECT * FROM users`, async (err, dbRes) => {
                 if (!err) {
