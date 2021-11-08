@@ -16,6 +16,5 @@ app.use(xss());
 app.use(compression());
 
 app.use(cors());
-app.options('*', cors);
 
 export default app;
