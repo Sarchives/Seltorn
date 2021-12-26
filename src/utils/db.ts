@@ -23,7 +23,7 @@ export default async (database: Client, logger: any) => {
         id text NOT NULL,
         name text NOT NULL,
         description TEXT,
-        public TEXT NOT NULL,
+        public boolean NOT NULL,
         channels text NOT NULL,
         roles text NOT NULL,
         members text NOT NULL,
