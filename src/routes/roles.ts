@@ -22,7 +22,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                         if (JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user).roles.find((x: string) => (roles.find((y: Role) => y?.id == x)?.permissions & 0x0000000800) == 0x0000000800)) {
                             res.send(roles);
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                     } else {
                         res.status(404).send({});
@@ -54,7 +54,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                         if (JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user).roles.find((x: string) => (roles.find((y: Role) => y?.id == x)?.permissions & 0x0000000800) == 0x0000000800)) {
                             res.send(roles.find((x: Role) => x?.id == roleId));
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                     } else {
                         res.status(404).send({});
@@ -153,7 +153,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 });
 
                             } else {
-                                res.status(401).send({});
+                                res.status(403).send({});
                             }
                         } else {
                             res.status(404).send({});
@@ -265,7 +265,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                         }
                                     });
                                 } else {
-                                    res.status(401).send({});
+                                    res.status(403).send({});
                                 }
                             } else {
                                 res.status(404).send({})
@@ -314,7 +314,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                     }
                                 });
                             } else {
-                                res.status(401).send({});
+                                res.status(403).send({});
                             }
                         } else {
                             res.status(404).send({})

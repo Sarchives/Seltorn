@@ -18,7 +18,7 @@ export default (wss: WebSocketServer, websockets: Map<string, WebSocket[]>, serv
             }
     });
 
-    async function checkLogin(token: string): Promise<User> {
+    async function checkLogin(token: string, verify?: boolean): Promise<User> {
         return await new Promise(resolve => {
             const emptyUser: User = {
                 id: "",
@@ -27,11 +27,13 @@ export default (wss: WebSocketServer, websockets: Map<string, WebSocket[]>, serv
                 password: "",
                 username: "",
                 discriminator: "",
-                creation: 0
+                creation: 0,
+                verified: false,
+                verificator: ''
             };
             database.query(`SELECT * FROM users`, async (err, res) => {
                 if (!err) {
-                    if (res.rows.map(x => x.token == token).includes(true)) {
+                    if (res.rows.find(x => x.token == token) && (!verify || res.rows.find(x => x.token == token).verified)) {
                         try {
                             const { importSPKI } = require('jose/key/import');
                             const { jwtVerify } = require('jose/jwt/verify');

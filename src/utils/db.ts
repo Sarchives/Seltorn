@@ -11,6 +11,8 @@ export default async (database: Client, logger: any) => {
         username text NOT NULL,
         discriminator text NOT NULL,
         creation text NOT NULL,
+        verified boolean NOT NULL,
+        verificator text NOT NULL,
         PRIMARY KEY (id)
     )`, (err, dbRes) => {
         if (err) {

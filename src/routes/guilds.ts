@@ -28,7 +28,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 return newChannels;
                             })() : guild[x])[index] }), {}));
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                     } else {
                         res.status(404).send({});
@@ -68,49 +68,6 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
             });
         } else {
             res.status(400).send({});
-        }
-    });
-
-    app.patch('/guilds/*/icons', (req: express.Request, res: express.Response) => {
-        const urlParamsValues: string[] = Object.values(req.params);
-        const guildId = urlParamsValues
-            .map((x) => x.replace(/\//g, ''))
-            .filter((x) => {
-                return x != '';
-            })[0];
-        if (guildId) {
-            database.query(`SELECT * FROM guilds`, (err, dbRes) => {
-                if (!err) {
-                    const preGuild = dbRes.rows.find(x => x?.id == guildId);
-                    if (preGuild) {
-                    const guild: Guild = Object.keys(preGuild).reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(preGuild).map(x => x == 'channels' || x == 'members' || x == 'roles' ? JSON.parse(preGuild[x]) : preGuild[x])[index] }), {}) as Guild;
-                        if (guild.members.find(x => x?.id == res.locals.user)?.roles.find(x => ((guild?.roles.find(y => y?.id == x)?.permissions ?? 0) & 0x0000000010) == 0x0000000010)) {
-                            if(req.body.image?.startsWith('data:image/png')) {    
-                               require('fs').writeFileSync(__dirname + '/../../icons/' + guildId + '.png', req.body.image.replace(/^data:image\/png;base64,/, ""), 'base64');   
-                               guild.members.forEach(member => {
-                                websockets.get(member.id)?.forEach(websocket => {
-                                    websocket.send(JSON.stringify({ event: 'guildIconEdited', id: guildId }));
-                                });
-                            });       
-                                      res.status(200).send({});  
-                        } else if(req.body.image == null) {
-                            require('fs').unlinkSync(__dirname + '/../../icons/' + guildId + '.png');   
-                            res.status(200).send({});
-                        } else {
-                            res.status(401).send({});
-                        }
-                    } else {
-                        res.status(400).send({});
-                    }
-                    } else {
-                        res.status(404).send({});
-                    }
-                } else {
-                    res.status(500).send({});
-                }
-            });
-        } else {
-            res.status(404).send({});
         }
     });
 
@@ -168,7 +125,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 }
                             });
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                     } else {
                         res.status(404).send({});
@@ -210,7 +167,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 }
                             });
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                     } else {
                         res.status(404).send({});

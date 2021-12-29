@@ -10,6 +10,8 @@ export interface User {
     username: string;
     discriminator: string;
     creation: number;
+    verified: boolean;
+    verificator: string;
 };
 
 export interface Friend {

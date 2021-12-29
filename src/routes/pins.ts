@@ -149,7 +149,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 }
                             });
                         } else {
-                            res.status(401).send({});
+                            res.status(403).send({});
                         }
                         } else {
                             res.status(404).send({});
@@ -199,7 +199,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                         JSON.parse(guild.members).forEach((member: Member) => {
                                             if(member.roles.map(x => channel.roles.find((y: Role) => y.id == x)).map(x => (x.permissions & 0x0000000080) == 0x0000000080).includes(true)) {
                                             websockets.get(member.id)?.forEach(websocket => {
-                                                websocket.send(JSON.stringify({ event: 'messageUnpinned', guild: guildId, channel: channelId, message: messageId }));
+                                                websocket.send(JSON.stringify({ event: 'messageUnpinned', guild: guildId, channel: channelId, message: message }));
                                             });
                                         }
                                         });
