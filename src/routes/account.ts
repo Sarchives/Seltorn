@@ -25,26 +25,26 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 if (!err) {
                                     res.send({ token: token });
                                 } else {
-                                    res.status(500).send({});
+                                    res.status(500).send({ error: "Something went wrong with our server." });
                                 }
                             });
                         } else {
                             res.send({ token: user.token });
                         }
                     } else {
-                        res.status(403).send({});
+                        res.status(403).send({ error: "Account not verified." });
                     }
                         } else {
-                            res.status(401).send({});
+                            res.status(401).send({ error: "Invalid information." });
                         }
                     } catch(e) {
-                        res.status(500).send({});
+                        res.status(500).send({ error: "Something went wrong with our server." });
                     }
                 } else {
-                    res.status(401).send({});
+                    res.status(401).send({ error: "Invalid information." });
                 }
             } else {
-                res.status(500).send({});
+                res.status(500).send({ error: "Something went wrong with our server." });
             }
         });
     });
@@ -81,21 +81,21 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 'Thank you for registering to Seltorn!\n',
                                 'To start using it, we need to verify your email address.\n',
                                 'Click here to verify: http://localhost:3001/verify/' + verificator + '\n\n'].join('')).toString('base64url'));
-                                res.status(200).send({});
+                                res.send({});
                             } else {
-                                res.status(500).send({});
+                                res.status(500).send({ error: "Something went wrong with our server." });
                             }
                         });
                     } else {
-                        res.status(401).send({});
+                        res.status(401).send({ error: "Email in use." });
                     }
                 } else {
-                    res.status(500).send({});
+                    res.status(500).send({ error: "Something went wrong with our server." });
                 }
             });
 
         } else {
-            res.status(400).send({});
+            res.status(400).send({ error: "Something is missing." });
         }
     });
 

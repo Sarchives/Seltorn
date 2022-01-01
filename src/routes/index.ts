@@ -11,6 +11,8 @@ import account from './account';
 
 import users from './users';
 
+import invites from './invites';
+
     import messages from './messages';
 
     import pins from './pins';
@@ -48,6 +50,8 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
 
     users(websockets, app, database);
 
+    invites(websockets, app, database);
+
     messages(websockets, app, database, flake);
 
     pins(websockets, app, database, flake);
@@ -66,12 +70,12 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if(req.url.startsWith('/icons/users/')) {
             res.redirect('/icons/user.png');
         } else {
-        res.status(404).send({});
+        res.status(404).send({ error: "Not found." });
         }
     });
 
     app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.status(500).send({});
+        res.status(500).send({ error: "Something went wrong with our server." });
     });
 
     async function checkLogin(token: string): Promise<User> {

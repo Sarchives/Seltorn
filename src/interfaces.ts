@@ -66,6 +66,14 @@ export interface Channel {
     pins: string[];
 };
 
+export interface Invite {
+    code: string;
+    author: string | Author;
+    expiration: number;
+    maxUses: number;
+    uses: number;
+}
+
 export interface Guild {
     id: string;
     name: string,
@@ -75,4 +83,5 @@ export interface Guild {
     roles: Role[],
     members: Member[],
     bans: string[];
+    invites: Invite[];
 };

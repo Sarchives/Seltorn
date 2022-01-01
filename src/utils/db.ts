@@ -30,6 +30,7 @@ export default async (database: Client, logger: any) => {
         roles text NOT NULL,
         members text NOT NULL,
         bans text NOT NULL,
+        invites text NOT NULL,
         PRIMARY KEY (id)
     )`, (err, dbRes) => {
         if (err) {

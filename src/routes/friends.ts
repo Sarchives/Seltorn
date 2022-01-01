@@ -8,13 +8,9 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         database.query(`SELECT * FROM friends`, async (err, dbRes) => {
             if (!err) {
                 const friends = JSON.parse(dbRes.rows.find(x => x?.id == res.locals.user) ?? JSON.stringify({ friends: [] })).friends;
-                if (friends.length > 0) {
                     res.send(friends.friends);
-                } else {
-                    res.status(404).send({});
-                }
             } else {
-                res.status(500).send({});
+                res.status(500).send({ error: "Something went wrong with our server." });
             }
         });
     });
@@ -34,10 +30,10 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                     if (friend) {
                         res.send(friend);
                     } else {
-                        res.status(404).send({});
+                        res.status(404).send({ error: "Friend not found." });
                     }
                 } else {
-                    res.status(500).send({});
+                    res.status(500).send({ error: "Something went wrong with our server." });
                 }
             });
         }
@@ -64,68 +60,36 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                     if (dbEntry) {
                                         database.query(`UPDATE friends SET friends = $1`, [JSON.stringify(friends)], (err, dbRes) => {
                                             if (!err) {
-                                                res.status(200).send(friend);
+                                                res.send(friend);
                                             } else {
-                                                res.status(500).send({});
+                                                res.status(500).send({ error: "Something went wrong with our server." });
                                             }
                                         });
                                     } else {
                                         database.query(`INSERT INTO friends (id, friends) VALUES ($1, $2)`, [res.locals.user, JSON.stringify(friends)], (err, dbRes) => {
                                             if (!err) {
-                                                res.status(200).send(friend);
+                                                res.send(friend);
                                             } else {
-                                                res.status(500).send({});
+                                                res.status(500).send({ error: "Something went wrong with our server." });
                                             }
                                         });
                                     }
                                 } else {
-                                    res.status(403).send({});
+                                    res.status(403).send({ error: "You can't friend this person." });
                                 }
                             } else {
-                                res.status(500).send({});
+                                res.status(500).send({ error: "Something went wrong with our server." });
                             }
                         });
                     } else {
                         res.status(404).send({})
                     }
                 } else {
-                    res.status(500).send({});
+                    res.status(500).send({ error: "Something went wrong with our server." });
                 }
             });
         } else {
-            res.status(400).send({});
-        }
-    });
-
-    app.patch('/friends/*', async (req: express.Request, res: express.Response) => {
-        const urlParamsValues: string[] = Object.values(req.params);
-        const friendId = urlParamsValues
-            .map((x) => x.replace(/\//g, ''))
-            .filter((x) => {
-                return x != '';
-            })[0];
-        if (friendId && (req.body.type == 'friend' || req.body.type == 'blocked')) {
-            database.query(`SELECT * FROM friends`, async (err, dbRes) => {
-                if (!err) {
-                    const friends = JSON.parse(dbRes.rows.find(x => x?.id == res.locals.user)?.friends ?? "[]");
-                    if (res.locals.user != friendId && friends.find((x: Friend) => x?.id == friendId)) {
-                        friends[friends.findIndex((x: Friend) => x?.id == friendId)].blocked = req.body.type == 'blocked';
-                        database.query(`UPDATE friends SET friends = $1`, [JSON.stringify(friends)], (err, dbRes) => {
-                            if (!err) {
-                                res.status(200).send(friends[friends.findIndex((x: Friend) => x?.id == friendId)]);
-                            } else {
-                                res.status(500).send({});
-                            }
-                        });
-                    } else {
-                        res.status(403).send({});
-                    }
-                } else {
-                    res.status(500).send({});
-                }
-            });
-        } else {
-            res.status(400).send({});
+            res.status(400).send({ error: "Something is missing." });
         }
     });
 
@@ -145,20 +109,20 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                         delete friends[friends.findIndex((x: Friend) => x?.id == friendId)];
                         database.query(`UPDATE friends SET friends = $1`, [JSON.stringify(friends)], (err, dbRes) => {
                             if (!err) {
-                                res.status(200).send(exFriend);
+                                res.send(exFriend);
                             } else {
-                                res.status(500).send({});
+                                res.status(500).send({ error: "Something went wrong with our server." });
                             }
                         });
                     } else {
-                        res.status(403).send({});
+                        res.status(403).send({ error: "You can't unfriend this person." });
                     }
                 } else {
-                    res.status(500).send({});
+                    res.status(500).send({ error: "Something went wrong with our server." });
                 }
             });
         } else {
-            res.status(400).send({});
+            res.status(400).send({ error: "Something is missing." });
         }
     });
 };
