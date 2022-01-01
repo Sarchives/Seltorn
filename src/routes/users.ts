@@ -82,17 +82,17 @@ app.delete('/users/@me/guilds/*', (req: express.Request, res: express.Response) 
                                     }
                             });
                         } else {
-                            res.status(403).send({ error: "Not authorized." });
+                            res.status(403).send({ error: "You can't leave this guild." });
                         }
                     } else {
-                        res.status(404).send({ error: "Not found." });
+                        res.status(404).send({ error: "Guild not found." });
                     }
                 } else {
                     res.status(500).send({ error: "Something went wrong with our server." });
                 }
             });
         } else {
-            res.status(404).send({ error: "Not found." });
+            res.status(400).send({ error: "Something is missing." });
         }
 });
 
@@ -126,7 +126,7 @@ app.delete('/users/@me/guilds/*', (req: express.Request, res: express.Response) 
                                 const returnedUser: ReturnedUser = rest;
                         res.send(returnedUser);
                     } else {
-                        res.status(404).send({ error: "Not found." });
+                        res.status(404).send({ error: "User not found." });
                     }
                 } else {
                     res.status(500).send({ error: "Something went wrong with our server." });

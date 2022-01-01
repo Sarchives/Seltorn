@@ -11,6 +11,7 @@ const schema = Joi.object({
     DB_PASSWORD: Joi.string().default(''),
     DB_DATABASE: Joi.string().default('postgres'),
     DB_PORT: Joi.number().default(5433),
+    CLIENT_DOMAIN: Joi.string().default('http://localhost:3001')
   })
   .unknown();
 
@@ -22,6 +23,9 @@ export default {
   env: value.NODE_ENV,
   server: {
     port: value.SVR_PORT,
+  },
+  client: {
+    domain: value.CLIENT_DOMAIN
   },
   db: {
     user: value.DB_USER,
