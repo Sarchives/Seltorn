@@ -14,14 +14,14 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
-                    if (JSON.parse(guild.members).find((x: Member) => x.id == res.locals.user)) {
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
+                    if (JSON.parse(guild.members).find((x: Member) => x.id === res.locals.user)) {
                         database.query(`SELECT * FROM users`, async (err, dbRes) => {
                             if (!err) {
                                         res.send(JSON.parse(guild.members).map((x: Member) => {
                                             if (x) {
-                                                x.username = dbRes.rows.find(y => x?.id == y.id).username;
-                                                x.discriminator = dbRes.rows.find(y => x?.id == y.id).discriminator;
+                                                x.username = dbRes.rows.find(y => x?.id === y.id).username;
+                                                x.discriminator = dbRes.rows.find(y => x?.id === y.id).discriminator;
                                             }
                                             return x;
                                         }).sort((a: Member, b: Member) => (a.nickname ?? a.username) > (b.nickname ?? b.username) ? 1 : (a.nickname ?? a.username) < (b.nickname ?? b.username) ? -1 : 0));
@@ -51,13 +51,13 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (JSON.parse(guild.members).find((x: Member) => x.id === res.locals.user)) {
                         database.query(`SELECT * FROM users`, async (err, dbRes) => {
                                     if (!err) {
-                                        res.send(JSON.parse(guild.members).filter((x: Member) => x?.id == res.locals.user).map((x: Member) => {
-                                            x.username = dbRes.rows.find(x => x.id == res.locals.user).username;
-                                            x.discriminator = dbRes.rows.find(x => x.id == res.locals.user).discriminator;
+                                        res.send(JSON.parse(guild.members).filter((x: Member) => x?.id === res.locals.user).map((x: Member) => {
+                                            x.username = dbRes.rows.find(x => x.id === res.locals.user).username;
+                                            x.discriminator = dbRes.rows.find(x => x.id === res.locals.user).discriminator;
                                             return x;
                                         })[0]);
                                     } else {
@@ -88,13 +88,13 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId && userId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (JSON.parse(guild.members).find((x: Member) => x.id === res.locals.user)) {
                         database.query(`SELECT * FROM users`, async (err, dbRes) => {
                                     if (!err) {
-                                        res.send(JSON.parse(guild.members).filter((x: Member) => x?.id == userId).map((x: Member) => {
-                                            x.username = dbRes.rows.find(x => x.id == userId).username;
-                                            x.discriminator = dbRes.rows.find(x => x.id == userId).discriminator;
+                                        res.send(JSON.parse(guild.members).filter((x: Member) => x?.id === userId).map((x: Member) => {
+                                            x.username = dbRes.rows.find(x => x.id === userId).username;
+                                            x.discriminator = dbRes.rows.find(x => x.id === userId).discriminator;
                                             return x;
                                         })[0]);
                                     } else {
@@ -123,14 +123,14 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (guild) {
-                        if (JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id == x)?.permissions & 0x0000000200) == 0x0000000200)) {
-                            if ((req.body.nickname && req.body.nickname.length < 31) || req.body.nickname == null) {
+                        if (JSON.parse(guild.members).find((x: Member) => x?.id === res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id === x)?.permissions & 0x0000000200) === 0x0000000200)) {
+                            if ((req.body.nickname && req.body.nickname.length < 31) || req.body.nickname === null) {
                                 const members = JSON.parse(guild.members);
-                                const user = members.find((x: Member) => x?.id == res.locals.user);
+                                const user = members.find((x: Member) => x?.id === res.locals.user);
                                 user.nickname = req.body.nickname ? req.body.nickname : null;
-                                members[members.findIndex((x: Member) => x?.id == res.locals.user)] = user;
+                                members[members.findIndex((x: Member) => x?.id === res.locals.user)] = user;
                                 database.query(`UPDATE guilds SET members = $1 WHERE id = $2`, [JSON.stringify(members), guildId], (err, dbRes) => {
                                     if (!err) {
                                         members.forEach((member: Member) => {
@@ -171,22 +171,14 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (guild) {
                         const members = JSON.parse(guild.members);
-                        if(!members.find((x: Member) => x?.id == res.locals.user)?.roles.includes('0')) {
-                                delete members[members.findIndex((x: Member) => x?.id == res.locals.user)];
+                        if(!members.find((x: Member) => x?.id === res.locals.user)?.roles.includes('0')) {
+                                delete members[members.findIndex((x: Member) => x?.id === res.locals.user)];
                                 database.query(`UPDATE guilds SET members = $1 WHERE id = $2`, [JSON.stringify(members), guildId], (err, dbRes) => {
                                     if (!err) {
-                                        const parsedGuild = Object.keys(guild).reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(guild).map(x => x == 'bans' || x == 'members' || x == 'roles' ? JSON.parse(guild[x]) : x == 'channels' ? (() => {
-                                            let channels = JSON.parse(guild[x]);
-                                            const newChannels = channels.map((channel: any) => {
-                                            delete channel.messages;
-                                            delete channel.pins;
-                                            return channel;
-                                        });
-                                            return newChannels;
-                                        })() : guild[x])[index] }), {});
+                                        const parsedGuild = Object.keys(guild).filter(x => x !== 'invites' && x !== 'channels' && x !== 'bans').reduce((obj, key, index) => ({ ...obj, [key]: Object.keys(guild).filter(x => x !== 'invites' && x !== 'channels' && x !== 'bans').map(x => x === 'bans' || x === 'roles' ? JSON.parse(guild[x]) : x === 'members' ? Object.keys(JSON.parse(guild[x])).length : guild[x])[index] }), {});
                                             websockets.get(res.locals.user)?.forEach(websocket => {
                                                 websocket.send(JSON.stringify({ event: 'guildLeft', guild: parsedGuild }));
                                             });
@@ -222,14 +214,14 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId && userId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (guild) {
-                        if (JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user).roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id == x)?.permissions & 0x0000000400) == 0x0000000400)) {
-                            if ((req.body.nickname && req.body.nickname.length < 31) || req.body.nickname == null) {
+                        if (JSON.parse(guild.members).find((x: Member) => x?.id === res.locals.user).roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id === x)?.permissions & 0x0000000400) === 0x0000000400)) {
+                            if ((req.body.nickname && req.body.nickname.length < 31) || req.body.nickname === null) {
                                 const members = JSON.parse(guild.members);
-                                const user = members.find((x: Member) => x?.id == userId);
+                                const user = members.find((x: Member) => x?.id === userId);
                                 user.nickname = req.body.nickname ? req.body.nickname : null;
-                                members[members.findIndex((x: Member) => x?.id == userId)] = user;
+                                members[members.findIndex((x: Member) => x?.id === userId)] = user;
                                 database.query(`UPDATE guilds SET members = $1 WHERE id = $2`, [JSON.stringify(members), guildId], (err, dbRes) => {
                                     if (!err) {
                                         members.forEach((member: Member) => {
@@ -272,12 +264,12 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
         if (guildId && userId) {
             database.query(`SELECT * FROM guilds`, (err, dbRes) => {
                 if (!err) {
-                    const guild = dbRes.rows.find(x => x?.id == guildId);
+                    const guild = dbRes.rows.find(x => x?.id === guildId);
                     if (guild) {
-                        if ((!req.body.ban && JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id == x)?.permissions & 0x0000000002) == 0x0000000002)) || (req.body.ban && JSON.parse(guild.members).find((x: Member) => x?.id == res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id == x)?.permissions & 0x0000000004) == 0x0000000004))) {
+                        if ((!req.body.ban && JSON.parse(guild.members).find((x: Member) => x?.id === res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id === x)?.permissions & 0x0000000002) === 0x0000000002)) || (req.body.ban && JSON.parse(guild.members).find((x: Member) => x?.id === res.locals.user)?.roles.find((x: string) => (JSON.parse(guild.roles).find((y: Role) => y?.id === x)?.permissions & 0x0000000004) === 0x0000000004))) {
                             const members = JSON.parse(guild.members);
-                                const user = members.find((x: Member) => x?.id == userId);
-                                delete members[members.findIndex((x: Member) => x?.id == userId)];
+                                const user = members.find((x: Member) => x?.id === userId);
+                                delete members[members.findIndex((x: Member) => x?.id === userId)];
                                 let bans = JSON.parse(guild.bans);
                                 if (req.body.ban) {
                                     bans.push(userId);

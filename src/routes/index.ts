@@ -93,7 +93,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
             };
             database.query(`SELECT * FROM users`, async (err, res) => {
                 if (!err) {
-                    if (res.rows.find(x => x.token == token) && res.rows.find(x => x.token == token).verified) {
+                    if (res.rows.find(x => x.token === token) && res.rows.find(x => x.token === token).verified) {
                         try {
                             const { importSPKI } = require('jose/key/import');
                             const { jwtVerify } = require('jose/jwt/verify');
@@ -104,7 +104,7 @@ export default (websockets: Map<string, WebSocket[]>, app: express.Application, 
                                 issuer: 'seltorn',
                                 audience: 'seltorn'
                             });
-                            resolve(res.rows.find(x => x.token == token));
+                            resolve(res.rows.find(x => x.token === token));
 
                         } catch {
                             resolve(emptyUser);
